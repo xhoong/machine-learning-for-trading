@@ -1,5 +1,13 @@
 # Installation instructions
 
+It is not necessary to try and install all libraries at once because this increases the likeliihood of encountering version conflicts. Instead, we recommend that you install the libraries required for a specific chapter as you go along.
+
+> Update March 2022: `zipline-reloaded`, `pyfolio-reloaded`, `alphalens-reloaded`, and `empyrical-reloaded` are now available on the `conda-forge` channel. The channel `ml4t` only contains outdated versions and will soon be removed.
+
+> There is still incomplete support for MacOS using M1/Silicone chips. Some packages compatible with new architecture are only available via `conda`/`mamba`, others only via `pip`. As a result, there is no single installation script yet - I hope to be able to simplify this as the support across the PyData ecosystem matures. For now, please create separate `conda`/`pip`-based environments to install packages as needed and supported.
+ 
+> Update September 10, 2021: New OS-agnostic environment files `ml4t-base.[txt, yml]` for `pip` (Linux, MacOS) and `conda` (Linux, MacOS, Windows) installs available that include the latest [Zipline](https://github.com/stefan-jansen/zipline-reloaded), [Alphalens](https://github.com/stefan-jansen/alphalens-reloaded) and [Pyfolio](https://github.com/stefan-jansen/pyfolio-reloaded) versions. These files are OS-agnostic because they include only the main libraries and not OS-specific dependencies, leaving the selection of the latest compatible versions and OS-specific dependencies to your package manager of choice.   
+
 > Update April 25, 2021: The [new Zipline version](https://github.com/stefan-jansen/zipline-reloaded) permits running the backtest notebooks without Docker on all operating systems; the installation instructions now refer to Windows/MacOS/Linux environment files.  
 
 > Update March 14, 2021: I have just released a [new Zipline version](https://github.com/stefan-jansen/zipline-reloaded) that runs on Python 3.7-3.9; see [release info](https://github.com/stefan-jansen/zipline-reloaded/releases/tag/2.0.0rc4) and [docs](https://zipline.ml4trading.io/). As a result, the Docker solution will no longer be necessary going forward and I will provide new environment files over the course of April.
@@ -13,6 +21,13 @@
 This book uses Python 3.8 and various ML- and trading-related libraries that can be installed:
 
 1. Using [mamba](https://github.com/mamba-org/mamba) in [conda environments](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) based on the [Miniconda](https://docs.conda.io/en/latest/miniconda.html) distribution and the provided `ml4t.yml` environment files,
+   - If you run into issues with the OS-specific files, please use the agnostic `installation/ml4t-base.yml` file instead.
+   - Run:
+   - ```bash
+     conda create -n ml4t python=3.8
+     mamba env update -n ml4t -f ml4t-base.yml
+     conda activate ml4t
+     ```
 2. For macOS and Linux only: via [pip](https://pip.pypa.io/en/stable/) in a Python virtual environment created with, e.g., [pyenv](https://github.com/pyenv/pyenv) or [venv](https://docs.python.org/3/tutorial/venv.html) using the provided `ml4t.txt` requirement files.
 3. Deprecated: using [Docker](https://www.docker.com/) Desktop to pull an image from [Docker Hub](https://www.docker.com/products/docker-hub) and create a local container with the requisite software to run the notebooks. 
 
@@ -55,9 +70,10 @@ conda install -n base -c conda-forge mamba
 To create a [virtual environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with the latest versions of the libraries used in the notebooks (as of April 2021), you just need to run one of the following options (depending on your operating system) from the command line in the root directory of the cloned repo:
 
 ```bash
-mamba env create -f installation/windows/ml4t.yml 
-mamba env create -f installation/macosx/ml4t.yml 
-mamba env create -f installation/linux/ml4t.yml 
+conda env create -n ml4t python=3.8
+mamba env update -n ml4t -f installation/windows/ml4t.yml 
+mamba env update -n ml4t -f installation/macosx/ml4t.yml # deprecated; use ml4t-base.yml
+mamba env update -n ml4t -f installation/linux/ml4t.yml 
 ```
 
 See also [here](https://towardsdatascience.com/getting-started-with-python-environments-using-conda-32e9f2779307) for a more detailed tutorial on virtual environments.
@@ -100,7 +116,7 @@ brew install lightgbm swig xz ta-lib
 On Ubuntu, pre-requisites can be fulfilled via `apt`. For TA-Lib, the [necessary steps](https://artiya4u.medium.com/installing-ta-lib-on-ubuntu-944d8ca24eae) are:
 
 ```bash
-# nstall the build tool
+# install the build tool
 sudo apt install build-essential wget -y
 
 # Download and extract the source code
@@ -121,7 +137,7 @@ sudo make install
 Assuming you have created and activated a virtual environment, you just need to run (depending on your OS):
 ```bash
 pip install -U pip setuptools wheel
-pip install -r installation/macosx/ml4t.txt # for macOS
+pip install -r installation/macosx/ml4t.txt # for macOS; deprecated; use ml4t-base.txt
 pip install -r installation/linux/ml4t.txt # for Ubuntu
 ```
 
@@ -153,7 +169,7 @@ This section covers how to set up notebook extension that facilitate working in 
 
 #### Set up jupyter extensions
 
-jupyter notebooks can use a range of [extentsion](https://github.com/ipython-contrib/jupyter_contrib_nbextensions) provided by the community. There are many useful ones that are described in the [documentation](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/).
+jupyter notebooks can use a range of [extension](https://github.com/ipython-contrib/jupyter_contrib_nbextensions) provided by the community. There are many useful ones that are described in the [documentation](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/).
 
 The notebooks in this repo are formatted to use the [Table of Contents (2)](https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/nbextensions/toc2/README.html) extension. For the best experience, activate it using the Configurator in the [Nbextensions](https://github.com/Jupyter-contrib/jupyter_nbextensions_configurator) tab available in your browser after starting the jupyter server. Modify the settings to check the option 'Leave h1 items out of ToC' if not set by default.
 
@@ -299,7 +315,7 @@ Now you are running a shell inside the container and can access both [conda envi
 
 The `backtest` environment is necessary because the latest version of Zipline 1.4.1 only support Python 3.6 and older versions of various other dependencies that partly also require compilation. I hope to update Zipline in the future to run on Python 3.8 as well.
 
-We use the environment `ml4t` except for a dozen notebooks related to backtesting that use Zipline directly inputs generated by Zipline. The noteooks that require the `backtest` environment contain a notification. 
+We use the environment `ml4t` except for a dozen notebooks related to backtesting that use Zipline directly inputs generated by Zipline. The notebooks that require the `backtest` environment contain a notification. 
 
 > If you want to use a GPU for the deep learning examples, you can run `conda install tensorflow-gpu` if you have the proper [CUDA version](https://www.tensorflow.org/install/source#gpu) installed. 
 > **Alternatively**, you can leverage [TensorFlow's Docker](https://www.tensorflow.org/install/docker) images and install any additional libraries there; the DL examples don't require anything that's overly complicated to install.
@@ -344,7 +360,7 @@ That's all. Unfortunately, you (had to..) repeat this everytime you run `zipline
 
 ### Working with notebooks int the Docker container
 
-You can run [juypter](https://jupyter.org/) notebooks using either the traditional [notebook](https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/what_is_jupyter.html) or the more recent [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) interface; both are available in all `conda` environments. Moreover, you start jupyter from the `base` environment and switch the environment from the notebook due to the `nb_conda_kernels` package (see [docs](https://github.com/Anaconda-Platform/nb_conda_kernels). 
+You can run [jupyter](https://jupyter.org/) notebooks using either the traditional [notebook](https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/what_is_jupyter.html) or the more recent [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) interface; both are available in all `conda` environments. Moreover, you start jupyter from the `base` environment and switch the environment from the notebook due to the `nb_conda_kernels` package (see [docs](https://github.com/Anaconda-Platform/nb_conda_kernels). 
 
 To get started, run one of the following two commands:
 ```bash
